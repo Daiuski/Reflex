@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reflex</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div class="logo">
+        <span class="logo-text">REFLEX</span>
+        <span class="logo-dot"></span>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-btn active" data-panel="record" onclick="showPanel('record')">
+          <span class="nav-icon">⊙</span> Record
+        </button>
+        <button class="nav-btn" data-panel="trigger" onclick="showPanel('trigger')">
+          <span class="nav-icon">◎</span> Trigger
+        </button>
+        <button class="nav-btn" data-panel="options" onclick="showPanel('options')">
+          <span class="nav-icon">⚙</span> Options
+        </button>
+      </nav>
+
+      <!-- Hotkeys card -->
+      <div class="keybinds-card">
+        <div class="keybinds-title">Hotkeys</div>
+        <div class="keybind-row">
+          <span class="keybind-label">Play / Stop</span>
+          <div class="keybind-input none" id="kb-play-stop" tabindex="0"
+               onclick="armKeybind('play_stop')" title="Click to change">—</div>
+        </div>
+        <div class="keybind-row">
+          <span class="keybind-label">Record</span>
+          <div class="keybind-input" id="kb-record" tabindex="0"
+               onclick="armKeybind('record')" title="Click to change">—</div>
+        </div>
+        <div class="keybind-hint" id="keybindHint" style="display:none">
+          Press a key &nbsp;·&nbsp; Esc to cancel
+        </div>
+      </div>
+
+      <div class="monitor-card">
+        <div class="monitor-header">
+          <div class="monitor-status">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusLabel">Monitoring Off</span>
+          </div>
+          <div class="keybind-input none" id="kb-monitoring" tabindex="0"
+               onclick="armKeybind('monitoring')" title="Click to set hotkey" style="font-size:10px">—</div>
+        </div>
+        <button class="monitor-toggle" id="monitorToggle" onclick="toggleMonitoring()">
+          Enable
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main id="main">
+      <!-- Record Panel -->
+      <div class="panel active" id="panel-record">
+        <div class="panel-header">
+          <h2>Macro Recorder</h2>
+          <div class="file-actions">
+            <button class="btn btn-ghost" onclick="saveToFile()">Save to File</button>
+            <button class="btn btn-ghost" onclick="loadFromFile()">Load from File</button>
+          </div>
+        </div>
+
+        <div class="record-center">
+          <div class="record-btn-wrap" id="recordWrap">
+            <div class="record-ring ring1"></div>
+            <div class="record-ring ring2"></div>
+            <button class="record-btn" id="recordBtn" onclick="toggleRecord()">
+              <div class="record-inner"></div>
+            </button>
+          </div>
+          <div class="record-status" id="recordStatus">Click to record</div>
+          <div class="record-timer" id="recordTimer"></div>
+        </div>
+
+        <!-- Save form (hidden until stopped) -->
+        <div class="save-form" id="saveForm" style="display:none">
+          <input class="input" type="text" id="macroName" placeholder="Macro name…"
+            onfocus="pywebview.api.set_naming(true)"
+            onblur="pywebview.api.set_naming(false)" />
+          <button class="btn btn-primary" onclick="saveMacro()">Save Macro</button>
+          <button class="btn btn-ghost" onclick="discardRecording()">Discard</button>
+        </div>
+
+        <!-- Playback controls -->
+        <div class="playback-row">
+          <label class="label">Repeat</label>
+          <input class="input input-sm" type="number" id="repeatCount" value="1" min="1" max="9999" style="width:70px" />
+          <button class="btn btn-primary" id="playbackBtn" onclick="togglePlayback()">Start Playback</button>
+        </div>
+
+        <!-- Macro list -->
+        <div class="list-header">
+          <span>Saved Macros</span>
+          <span id="macroCount" class="badge">0</span>
+        </div>
+        <input class="input search-input" type="text" id="macroSearch"
+               placeholder="Search macros…" oninput="renderMacroList()" />
+        <div class="macro-list" id="macroList"></div>
+        <div class="empty-state" id="macroEmpty" style="display:none">
+          <div class="empty-icon">⊙</div>
+          <div class="empty-title">No macros yet</div>
+          <div class="empty-sub">Hit the record button above to capture your first macro</div>
+        </div>
+      </div>
+
+      <!-- Trigger Panel -->
+      <div class="panel" id="panel-trigger">
+        <div class="panel-header">
+          <h2>Color Triggers</h2>
+          <div class="file-actions">
+            <button class="btn btn-ghost" onclick="saveTriggersToFile()">Save to File</button>
+            <button class="btn btn-ghost" onclick="loadTriggersFromFile()">Load from File</button>
+            <button class="btn btn-primary" onclick="showAddTrigger()">+ Add Trigger</button>
+          </div>
+        </div>
+
+        <!-- Add / Edit trigger form -->
+        <div class="trigger-form card" id="triggerForm" style="display:none">
+          <div class="form-row" id="triggerMacroRow">
+            <label class="label">Macro</label>
+            <select class="input select" id="triggerMacro"></select>
+          </div>
+          <div class="form-row" id="triggerEditInfo" style="display:none">
+            <span class="label" id="triggerEditLabel"></span>
+          </div>
+          <div class="form-row" id="triggerCaptureRow">
+            <button class="btn btn-ghost" onclick="captureScreen()">Capture Screen</button>
+          </div>
+          <div class="form-row">
+            <div class="color-compare">
+              <div class="color-compare-item">
+                <span class="color-compare-label">Captured</span>
+                <div class="color-compare-swatch">
+                  <div class="color-preview-sm" id="capturedPreview" style="background:#555;"></div>
+                </div>
+              </div>
+              <div class="color-compare-item">
+                <span class="color-compare-label">Target</span>
+                <div class="color-compare-swatch">
+                  <div class="color-preview-sm" id="colorPreview" style="background:#ffffff;"></div>
+                  <input type="color" id="colorPicker" value="#ffffff" onchange="onColorPick(this.value)" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="label">Tolerance <span id="tolVal">20</span></label>
+            <input type="range" id="toleranceSlider" min="0" max="100" value="20"
+                   oninput="document.getElementById('tolVal').textContent=this.value" class="slider" />
+          </div>
+          <div class="form-row region-display" id="regionDisplay" style="display:none">
+            <label class="label">Region</label>
+            <span id="regionText" class="muted"></span>
+          </div>
+          <div class="form-row">
+            <label class="loop-label" style="font-size:12px">
+              <input type="checkbox" class="loop-check" id="triggerLoop" />
+              Loop (keep firing)
+            </label>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" id="triggerSaveBtn" onclick="saveTrigger()">Save Trigger</button>
+            <button class="btn btn-ghost" onclick="cancelTrigger()">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Trigger list -->
+        <div class="list-header">
+          <span>Active Triggers</span>
+          <span id="triggerCount" class="badge">0</span>
+        </div>
+        <input class="input search-input" type="text" id="triggerSearch"
+               placeholder="Search triggers…" oninput="renderTriggerList()" />
+        <div class="trigger-list" id="triggerList"></div>
+        <div class="empty-state" id="triggerEmpty" style="display:none">
+          <div class="empty-icon">◎</div>
+          <div class="empty-title">No triggers yet</div>
+          <div class="empty-sub">Add a trigger to fire macros automatically when a screen color matches</div>
+        </div>
+      </div>
+
+      <!-- Options Panel -->
+      <div class="panel" id="panel-options">
+        <div class="panel-header">
+          <h2>Options</h2>
+        </div>
+
+        <div class="options-list">
+          <div class="option-row">
+            <div class="option-info">
+              <div class="option-title">Always on Top</div>
+              <div class="option-desc">Keep the Reflex window above all other windows</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="opt-always-on-top" onchange="setSetting('always_on_top', this.checked)" />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="option-row">
+            <div class="option-info">
+              <div class="option-title">Playback Countdown</div>
+              <div class="option-desc">Show a 3-second countdown before a macro starts playing</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="opt-countdown" onchange="setSetting('countdown_enabled', this.checked)" checked />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="option-row">
+            <div class="option-info">
+              <div class="option-title">Sound Effects</div>
+              <div class="option-desc">Play audio feedback for recording, playback, countdown and keybinds</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="opt-sounds" onchange="onSoundsToggle(this.checked)" checked />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="option-row" id="opt-trigger-sound-row">
+            <div class="option-info">
+              <div class="option-title">Trigger Detection Sound</div>
+              <div class="option-desc">Play a chime when a color trigger fires</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="opt-trigger-sound" onchange="setSetting('trigger_sound_enabled', this.checked)" checked />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="option-divider"></div>
+
+          <div class="option-row option-row-danger">
+            <div class="option-info">
+              <div class="option-title">Clear All Data</div>
+              <div class="option-desc">Permanently delete all macros, triggers and reset all settings</div>
+            </div>
+            <button class="btn btn-danger" onclick="showClearConfirm()">Clear All Data</button>
+          </div>
+        </div>
+
+        <div class="options-footer">Made by Daiuski &nbsp;·&nbsp; REFLEX MACRO APP 2026</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Screenshot overlay -->
+  <div id="screenshotOverlay" style="display:none">
+    <canvas id="screenshotCanvas"></canvas>
+    <div class="overlay-hint">Drag to select a region &nbsp;·&nbsp; ESC to cancel</div>
+  </div>
+
+  <!-- Countdown overlay -->
+  <div id="countdownOverlay" style="display:none">
+    <div class="countdown-inner">
+      <div class="countdown-label">Playing in</div>
+      <div class="countdown-num" id="countdownNum">3</div>
+    </div>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div id="confirmOverlay" style="display:none">
+    <div class="confirm-box">
+      <div class="confirm-title">Clear All Data?</div>
+      <div class="confirm-body">This will permanently delete all macros, triggers, keybinds and settings. This cannot be undone.</div>
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" onclick="hideClearConfirm()">Cancel</button>
+        <button class="btn btn-danger" onclick="clearAllData()">Yes, Delete Everything</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toastContainer"></div>
+
+  <script src="sounds.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
