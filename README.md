@@ -2,12 +2,20 @@
 
 ![macOS 12+](https://img.shields.io/badge/macOS-12%2B-blue?logo=apple&logoColor=white)
 ![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
 Reflex is a lightweight macOS desktop app that lets you record keyboard and mouse actions as macros, bind them to hotkeys, and replay them on demand or automatically via color-detection triggers. No subscription, no cloud — runs fully offline.
 
 ## Screenshots
 
 <!-- Add screenshots here -->
+
+## Download
+
+Grab the latest `.dmg` from the [Releases](https://github.com/Daiuski/Reflex/releases) page. Open it, drag Reflex to your Applications folder, and you're done — no Python or dependencies required.
+
+> **Note:** On first launch macOS will prompt for Accessibility permission.
+> Open **System Settings → Privacy & Security → Accessibility** and enable Reflex.
 
 ## Features
 
@@ -21,34 +29,7 @@ Reflex is a lightweight macOS desktop app that lets you record keyboard and mous
 - **Undo deleted macros and triggers** — nothing is gone for good
 - **Save/load macros** to and from JSON files for backup or sharing
 - **Settings persisted** across launches
-- **Fully self-contained macOS .app** — end users need no Python install
-
-## Requirements (for development)
-
-- macOS 12 Ventura or later
-- Python 3.9+
-- Homebrew (for `create-dmg` when packaging)
-
-## Running from source
-
-```bash
-git clone https://github.com/daiuski/Reflex.git
-cd ReflexProject
-pip3 install -r reflex/requirements.txt
-python3 reflex/main.py
-```
-
-> **Note:** On first launch macOS will prompt for Accessibility permission.
-> Open **System Settings → Privacy & Security → Accessibility** and enable Reflex.
-
-## Building the installer
-
-```bash
-bash build.sh
-# Output: dist/Reflex-1.0.0.dmg
-```
-
-Requires Homebrew. The script installs `py2app` and `create-dmg` automatically.
+- **Fully self-contained macOS .app** — no Python install required
 
 ## Project structure
 
