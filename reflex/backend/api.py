@@ -52,6 +52,16 @@ def _notify(title, message):
         n.setInformativeText_(message)
         NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification_(n)
     except Exception:
+         try:
+            msg   = message.replace('"', '\\"')
+            title = title.replace('"', '\\"')
+            subprocess.Popen(
+                ['osascript', '-e',
+                 f'display notification "{msg}" with title "{title}"'],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
+        except Exception:
+            pass
 
 
 class ReflexAPI:
