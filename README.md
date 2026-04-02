@@ -6,7 +6,7 @@
 
 Reflex is a lightweight macOS desktop app that lets you record keyboard and mouse actions as macros, bind them to hotkeys, and replay them on demand or automatically via color-detection triggers. Runs fully offline.
 
-## Screenshots
+
 
 
 
