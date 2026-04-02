@@ -68,11 +68,11 @@ class ReflexAPI:
         self._naming           = False
         self._countdown_cancel = None
 
-        # Ensure autosave dir exists then load any saved data
+
         _AUTOSAVE_DIR.mkdir(parents=True, exist_ok=True)
         self._autoload()
 
-        # Keybinds — load persisted file, fall back to defaults
+   
         _cfg_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
         self._keybinds_file = os.path.join(_cfg_dir, 'keybinds.json')
         self._settings_file = os.path.join(_cfg_dir, 'settings.json')
@@ -85,7 +85,7 @@ class ReflexAPI:
         self.window = window
         self._start_hotkeys()
         threading.Thread(target=self._check_accessibility, daemon=True).start()
-        # Apply persisted always-on-top setting
+      
         if self._settings.get('always_on_top'):
             try:
                 window.on_top = True
