@@ -16,7 +16,7 @@ from backend.hotkeys  import HotkeyManager
 
 _DEFAULT_KEYBINDS = {'play_stop': '', 'record': '', 'monitoring': ''}
 
-# Auto-save directory in ~/Documents/ReflexMacros/
+
 _AUTOSAVE_DIR  = pathlib.Path.home() / 'Documents' / 'ReflexMacros'
 _AUTOSAVE_FILE = _AUTOSAVE_DIR / 'autosave.json'
 
@@ -44,17 +44,14 @@ def _strip_trailing_hotkey(events, key_str):
 
 
 def _notify(title, message):
-    """Send a macOS notification (fire and forget)."""
+   
     try:
-        msg   = message.replace('"', '\\"')
-        title = title.replace('"', '\\"')
-        subprocess.Popen(
-            ['osascript', '-e',
-             f'display notification "{msg}" with title "{title}"'],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-        )
+        from Foundation import NSUserNotification, NSUserNotificationCenter
+        n = NSUserNotification.alloc().init()
+        n.setTitle_(title)
+        n.setInformativeText_(message)
+        NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification_(n)
     except Exception:
-        pass
 
 
 class ReflexAPI:
