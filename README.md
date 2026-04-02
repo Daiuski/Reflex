@@ -23,9 +23,6 @@ Grab the latest `.dmg` from the [Releases](https://github.com/Daiuski/Reflex/rel
 - **Global hotkeys** — assign custom key combos to start/stop recording and trigger playback
 - **Loop macros** indefinitely with one toggle
 - **Color-trigger monitoring** — automatically fire a macro when a specific pixel color appears on screen
-- **3-second countdown** with a visual overlay before playback begins
-- **Sound effects** via Web Audio API (no external audio files needed)
-- **Always-on-top** window mode for easy access while using other apps
 - **Undo deleted macros and triggers** — nothing is gone for good
 - **Save/load macros** to and from files for backup or sharing
 - **Settings persisted** across launches
